@@ -1,0 +1,65 @@
+{% extends 'society/base.html' %}
+
+{% block title %}Admin Complaints | Smart Society Management System{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <h1 class="h4 fw-bold mb-1">All Complaints</h1>
+                <p class="text-muted mb-0">Search by resident name, title, category, status, or date.</p>
+            </div>
+            <a class="btn btn-outline-dark" href="{% url 'admin-dashboard' %}">Back to Dashboard</a>
+        </div>
+
+        <form method="get" class="row g-3 mb-4">
+            <div class="col-lg-5">{{ form.query }}</div>
+            <div class="col-lg-3">{{ form.status }}</div>
+            <div class="col-lg-3">{{ form.date }}</div>
+            <div class="col-lg-1 d-grid"><button class="btn btn-primary" type="submit">Search</button></div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Complaint ID</th>
+                        <th>Resident Name</th>
+                        <th>Flat Number</th>
+                        <th>Category</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                        <tr>
+                            <td>#{{ complaint.id }}</td>
+                            <td>{{ complaint.resident.full_name }}</td>
+                            <td>{{ complaint.resident.flat_number }}</td>
+                            <td>{{ complaint.get_category_display }}</td>
+                            <td>{{ complaint.title }}</td>
+                            <td>{{ complaint.description|truncatechars:70 }}</td>
+                            <td>{{ complaint.created_at|date:"d M Y" }}</td>
+                            <td><span class="badge rounded-pill text-bg-{% if complaint.status == 'pending' %}warning{% elif complaint.status == 'in_progress' %}primary{% else %}success{% endif %}">{{ complaint.get_status_display }}</span></td>
+                            <td class="text-nowrap">
+                                <a class="btn btn-sm btn-outline-primary" href="{% url 'complaint-update' complaint.pk %}">Update</a>
+                                <form method="post" action="{% url 'complaint-delete' complaint.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="9" class="text-muted">No complaints found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

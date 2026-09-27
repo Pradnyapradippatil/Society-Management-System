@@ -1,0 +1,26 @@
+{% extends 'society/base.html' %}
+
+{% block title %}Login | Smart Society Management System{% endblock %}
+{% block header_title %}Login{% endblock %}
+
+{% block content %}
+<section class="auth-card">
+    <h2>Sign in</h2>
+    <p>Residents can view notices and raise complaints. Admin users can manage complaint status and notices.</p>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="form-errors">{{ form.non_field_errors }}</div>
+        {% endif %}
+        {% for field in form %}
+            <label>
+                <span>{{ field.label }}</span>
+                {{ field }}
+                {% if field.errors %}<small class="field-error">{{ field.errors|striptags }}</small>{% endif %}
+            </label>
+        {% endfor %}
+        <button class="button primary" type="submit">Login</button>
+    </form>
+    <p class="auth-note">New resident? <a href="{% url 'register' %}">Create an account</a></p>
+</section>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'society/base.html' %}
+
+{% block title %}New Complaint | Smart Society Management System{% endblock %}
+{% block header_title %}Raise Complaint{% endblock %}
+
+{% block content %}
+<section class="auth-card">
+    <h2>Submit a complaint</h2>
+    <p>Choose the category and describe the issue clearly so it can be tracked and resolved.</p>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {% for field in form %}
+            <label>
+                <span>{{ field.label }}</span>
+                {{ field }}
+                {% if field.errors %}<small class="field-error">{{ field.errors|striptags }}</small>{% endif %}
+            </label>
+        {% endfor %}
+        <button class="button primary" type="submit">Submit complaint</button>
+    </form>
+</section>
+{% endblock %}

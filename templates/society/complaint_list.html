@@ -1,0 +1,55 @@
+{% extends 'society/base.html' %}
+
+{% block title %}Complaints | Smart Society Management System{% endblock %}
+{% block header_title %}Complaints{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-heading">
+        <h3>{% if is_admin %}All complaints{% else %}My complaints{% endif %}</h3>
+        {% if not is_admin %}<a class="button secondary" href="{% url 'complaint-create' %}">Raise complaint</a>{% endif %}
+    </div>
+
+    <form method="get" class="filter-bar">
+        <input type="search" name="query" placeholder="Search title, description, or category" value="{{ form.data.query }}">
+        <select name="status">
+            {% for value, label in form.fields.status.choices %}
+                <option value="{{ value }}" {% if form.data.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button class="button primary" type="submit">Filter</button>
+    </form>
+
+    {% if complaints %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        {% if is_admin %}<th>Resident</th><th>Action</th>{% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                        <tr>
+                            <td>{{ complaint.title }}</td>
+                            <td>{{ complaint.get_category_display }}</td>
+                            <td><span class="badge status-{{ complaint.status }}">{{ complaint.get_status_display }}</span></td>
+                            <td>{{ complaint.created_at|date:"M d, Y" }}</td>
+                            {% if is_admin %}
+                                <td>{{ complaint.resident.username }}</td>
+                                <td><a href="{% url 'complaint-update' complaint.pk %}">Update</a></td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state">No complaints found.</p>
+    {% endif %}
+</section>
+{% endblock %}

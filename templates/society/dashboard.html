@@ -1,0 +1,85 @@
+{% extends 'society/base.html' %}
+
+{% block title %}Dashboard | Smart Society Management System{% endblock %}
+{% block header_title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="hero-card">
+    <div>
+        <p class="eyebrow">Welcome{% if user.first_name %}, {{ user.first_name }}{% endif %}</p>
+        <h2>{{ is_admin|yesno:"Admin overview,Resident overview" }}</h2>
+        <p>Track complaints, monitor notices, and keep the society moving.</p>
+    </div>
+    <div class="hero-actions">
+        <a class="button primary" href="{% url 'complaint-create' %}">Raise complaint</a>
+        <a class="button secondary" href="{% url 'complaint-list' %}">View history</a>
+    </div>
+</section>
+
+<section class="stats-grid">
+    <article class="stat-card">
+        <span>Total complaints</span>
+        <strong>{{ complaint_counts.total|default:0 }}</strong>
+    </article>
+    <article class="stat-card">
+        <span>Pending complaints</span>
+        <strong>{{ complaint_counts.pending|default:0 }}</strong>
+    </article>
+    <article class="stat-card">
+        <span>Resolved complaints</span>
+        <strong>{{ complaint_counts.resolved|default:0 }}</strong>
+    </article>
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <h3>Society Notices</h3>
+    </div>
+    {% if notices %}
+        <div class="stacked-cards">
+            {% for notice in notices %}
+                <article class="info-card">
+                    <p class="card-label">Notice</p>
+                    <h4>{{ notice.title }}</h4>
+                    <p>{{ notice.message }}</p>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">No active notices yet.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <h3>Recent Complaints</h3>
+        <a href="{% url 'complaint-list' %}">Open history</a>
+    </div>
+    {% if recent_complaints %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        {% if is_admin %}<th>Resident</th>{% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in recent_complaints %}
+                        <tr>
+                            <td>{{ complaint.title }}</td>
+                            <td>{{ complaint.get_category_display }}</td>
+                            <td><span class="badge status-{{ complaint.status }}">{{ complaint.get_status_display }}</span></td>
+                            {% if is_admin %}<td>{{ complaint.resident.username }}</td>{% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state">No complaints submitted yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'society/base.html' %}
+
+{% block title %}Manage Notices | Smart Society Management System{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 sticky-top">
+            <div class="card-body p-4">
+                <h1 class="h4 fw-bold mb-2">Add Notice</h1>
+                <p class="text-muted mb-4">Post a new notice for all residents.</p>
+                <form method="post" class="vstack gap-3">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div>
+                            <label class="form-label fw-semibold">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endfor %}
+                    <button class="btn btn-dark" type="submit">Publish Notice</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h4 fw-bold mb-0">All Notices</h2>
+                    <a class="btn btn-outline-dark" href="{% url 'admin-dashboard' %}">Back to Dashboard</a>
+                </div>
+                <div class="vstack gap-3">
+                    {% for notice in notices %}
+                        <div class="border rounded-4 p-3">
+                            <div class="d-flex justify-content-between gap-3 flex-wrap">
+                                <div>
+                                    <h5 class="mb-1">{{ notice.title }}</h5>
+                                    <p class="mb-0 text-muted">{{ notice.description }}</p>
+                                </div>
+                                <div class="text-nowrap">
+                                    <a class="btn btn-sm btn-outline-primary" href="{% url 'notice-update' notice.pk %}">Edit</a>
+                                    <form method="post" action="{% url 'notice-delete' notice.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <small class="text-muted">{{ notice.created_at|date:"d M Y" }}</small>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted mb-0">No notices published yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

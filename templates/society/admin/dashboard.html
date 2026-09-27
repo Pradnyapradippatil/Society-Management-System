@@ -1,0 +1,113 @@
+{% extends 'society/base.html' %}
+
+{% block title %}Admin Dashboard | Smart Society Management System{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="card shadow-sm border-0 admin-sidebar h-100 sticky-top">
+            <div class="card-body p-3 p-xl-4">
+                <p class="text-uppercase text-accent fw-semibold mb-2">Admin Panel</p>
+                <h1 class="h4 fw-bold mb-4">{{ user.full_name }}</h1>
+                <div class="list-group list-group-flush">
+                    <a class="list-group-item list-group-item-action" href="{% url 'admin-dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+                    <a class="list-group-item list-group-item-action" href="{% url 'admin-complaints' %}"><i class="bi bi-chat-square-text me-2"></i>Complaints</a>
+                    <a class="list-group-item list-group-item-action" href="{% url 'admin-notices' %}"><i class="bi bi-megaphone me-2"></i>Notices</a>
+                    <a class="list-group-item list-group-item-action" href="{% url 'admin-register' %}"><i class="bi bi-person-badge me-2"></i>Add Admin</a>
+                    <a class="list-group-item list-group-item-action" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-9">
+        <div class="dashboard-hero admin-hero p-4 p-lg-5 mb-4 rounded-4 text-white">
+            <p class="text-uppercase fw-semibold opacity-75 mb-2">Admin Dashboard</p>
+            <h1 class="display-6 fw-bold mb-3">Society operations at a glance</h1>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-outline-light" href="{% url 'auth-home' %}"><i class="bi bi-house-door me-1"></i> Home</a>
+                <a class="btn btn-light" href="{% url 'admin-complaints' %}">View Complaints</a>
+                <a class="btn btn-outline-light" href="{% url 'admin-notices' %}">Manage Notices</a>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4"><div class="card stat-card h-100"><div class="card-body"><p class="text-muted mb-1">Total Complaints</p><h2 class="fw-bold mb-0">{{ counts.total|default:0 }}</h2></div></div></div>
+            <div class="col-md-4"><div class="card stat-card h-100"><div class="card-body"><p class="text-muted mb-1">Pending Complaints</p><h2 class="fw-bold mb-0">{{ counts.pending|default:0 }}</h2></div></div></div>
+            <div class="col-md-4"><div class="card stat-card h-100"><div class="card-body"><p class="text-muted mb-1">Resolved Complaints</p><h2 class="fw-bold mb-0">{{ counts.resolved|default:0 }}</h2></div></div></div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-7">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Latest Complaints</h5>
+                        <a class="small-link" href="{% url 'admin-complaints' %}">Open full table</a>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table align-middle table-hover">
+                            <thead><tr><th>ID</th><th>Resident</th><th>Title</th><th>Status</th><th>Action</th></tr></thead>
+                            <tbody>
+                                {% for complaint in complaints %}
+                                    <tr>
+                                        <td>#{{ complaint.id }}</td>
+                                        <td>{{ complaint.resident.full_name }}</td>
+                                        <td>{{ complaint.title }}</td>
+                                        <td><span class="badge rounded-pill text-bg-{% if complaint.status == 'pending' %}warning{% elif complaint.status == 'in_progress' %}primary{% else %}success{% endif %}">{{ complaint.get_status_display }}</span></td>
+                                        <td><a class="btn btn-sm btn-outline-primary" href="{% url 'complaint-update' complaint.pk %}">Update</a></td>
+                                    </tr>
+                                {% empty %}
+                                    <tr><td colspan="5" class="text-muted">No complaints yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white"><h5 class="mb-0">Add Notice</h5></div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'admin-notices' %}" class="vstack gap-3">
+                            {% csrf_token %}
+                            {% for field in notice_form %}
+                                <div>
+                                    <label class="form-label fw-semibold">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                            {% endfor %}
+                            <button class="btn btn-dark" type="submit">Publish Notice</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Latest Notices</h5>
+                <a class="small-link" href="{% url 'admin-notices' %}">Manage notices</a>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for notice in latest_notices %}
+                        <div class="col-md-6">
+                            <div class="notice-card p-3 h-100 rounded-4 border">
+                                <div class="d-flex justify-content-between gap-2">
+                                    <div>
+                                        <h6 class="mb-1">{{ notice.title }}</h6>
+                                        <p class="mb-0 text-muted">{{ notice.description|truncatechars:120 }}</p>
+                                    </div>
+                                    <small class="text-muted">{{ notice.created_at|date:"d M" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="col-12 text-muted">No notices published yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

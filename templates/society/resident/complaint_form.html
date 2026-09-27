@@ -1,0 +1,31 @@
+{% extends 'society/base.html' %}
+
+{% block title %}Raise Complaint | Smart Society Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h3 fw-bold mb-2">Raise Complaint</h1>
+                <p class="text-muted mb-4">Choose a category, describe the issue, and submit it for review.</p>
+                <form method="post" class="vstack gap-3">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    {% for field in form %}
+                        <div>
+                            <label class="form-label fw-semibold">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endfor %}
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-primary btn-lg" type="submit">Submit Complaint</button>
+                        <a class="btn btn-outline-secondary btn-lg" href="{% url 'resident-dashboard' %}">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

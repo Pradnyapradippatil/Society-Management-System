@@ -1,0 +1,27 @@
+{% extends 'society/base.html' %}
+
+{% block title %}Register | Smart Society Management System{% endblock %}
+{% block header_title %}Resident Registration{% endblock %}
+
+{% block content %}
+<section class="auth-card">
+    <h2>Create your resident account</h2>
+    <p>Use this form to register before signing in and raising complaints.</p>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="form-errors">{{ form.non_field_errors }}</div>
+        {% endif %}
+        {% for field in form %}
+            <label>
+                <span>{{ field.label }}</span>
+                {{ field }}
+                {% if field.help_text %}<small class="help-text">{{ field.help_text }}</small>{% endif %}
+                {% if field.errors %}<small class="field-error">{{ field.errors|striptags }}</small>{% endif %}
+            </label>
+        {% endfor %}
+        <button class="button primary" type="submit">Register</button>
+    </form>
+    <p class="auth-note">Already registered? <a href="{% url 'login' %}">Go to login</a></p>
+</section>
+{% endblock %}

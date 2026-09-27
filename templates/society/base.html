@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Smart Society Management System{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'society/styles.css' %}">
+</head>
+<body class="app-shell">
+<nav class="navbar navbar-expand-lg navbar-dark navbar-society sticky-top">
+    <div class="container-fluid px-3 px-lg-4">
+        <a class="navbar-brand fw-semibold" href="{% url 'auth-home' %}">Smart Society</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#societyNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="societyNav">
+            <ul class="navbar-nav ms-auto gap-lg-1">
+                <li class="nav-item"><a class="nav-link" href="{% url 'auth-home' %}"><i class="bi bi-house-door"></i> Home</a></li>
+                {% if user.is_authenticated %}
+                    {% if user.role == 'admin' or user.is_superuser %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin-dashboard' %}"><i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin-complaints' %}"><i class="bi bi-chat-square-text"></i> Complaints</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin-notices' %}"><i class="bi bi-megaphone"></i> Notices</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin-register' %}"><i class="bi bi-person-badge"></i> Add Admin</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'resident-dashboard' %}"><i class="bi bi-house"></i> Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'complaint-list' %}"><i class="bi bi-journal-text"></i> Complaints</a></li>
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link nav-action" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Resident Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Resident Register</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'admin-login' %}">Admin Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'admin-register' %}">Admin Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container-fluid px-3 px-lg-4 py-4">
+    {% if messages %}
+        <div class="mb-4 d-grid gap-2">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
